@@ -10,7 +10,7 @@ This guide explains how to set up and deploy the Slurm project using Docker secr
 .\setup-secrets.ps1
 
 # Deploy the stack
-docker-compose up -d
+docker-compose up -d         #goto RUNJOB.md
 ```
 
 ### Linux/macOS (Bash)
@@ -22,7 +22,7 @@ chmod +x setup-secrets.sh
 ./setup-secrets.sh
 
 # Deploy the stack
-docker-compose up -d
+docker-compose up -d         #goto RUNJOB.md
 ```
 
 ### Manual Setup (All Platforms)
