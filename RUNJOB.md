@@ -1,5 +1,15 @@
 ## Run Your First Job
 
+### Access the Controller or any other nodes
+
+```bash
+# Via Docker
+docker exec -it slurm-controller bash
+
+# Via SSH (alternative)
+ssh -p2201 wunmi@localhost
+```
+
 ### Check Cluster Status
 
 ```bash
@@ -19,16 +29,6 @@ Expected output:
 PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
 debug*       up   infinite      1   idle node1
 compute      up 1-00:00:00      1   idle node2
-```
-
-### Access the Controller
-
-```bash
-# Via Docker
-docker exec -it slurm-controller bash
-
-# Via SSH (alternative)
-ssh -p2201 wunmi@localhost
 ```
 
 ### Resume Nodes (if needed)
