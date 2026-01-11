@@ -1,5 +1,11 @@
 # Deployment Guide with Docker Secrets
 
+> **⚠️ DISCLAIMER: FOR LEARNING AND TESTING PURPOSES ONLY**
+>
+> This project is designed for educational and practice purposes to learn SLURM cluster management, Docker orchestration, and job scheduling concepts. It is **NOT intended for production use** and should **NOT be used in production environments** without significant modifications for security, scalability, and reliability.
+>
+> For production deployments, consult official SLURM documentation and follow enterprise-grade best practices.
+
 This guide explains how to set up and deploy the Slurm project using Docker secrets for secure password management.
 
 ## Quick Start
