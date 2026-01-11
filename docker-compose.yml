@@ -1,0 +1,187 @@
+services:
+  mysql:
+    image: mysql:8.0.40
+    container_name: slurm-mysql
+    hostname: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-slurm_acct_db}
+      MYSQL_USER: ${MYSQL_USER:-slurm}
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+    secrets:
+      - mysql_root_password
+      - mysql_password
+    networks:
+      - slurmnet
+    ports:
+      - "3307:3306"  # MySQL port (3307 on host, 3306 in container)
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./slurm/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "mysqladmin ping -h localhost -u root -p$$(cat /run/secrets/mysql_root_password)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+  slurmdbd:
+    build: ./slurm
+    container_name: slurm-slurmdbd
+    hostname: slurmdbd
+    restart: unless-stopped
+    environment:
+      - ROLE=slurmdbd
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=${MYSQL_USER:-slurm}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-slurm_acct_db}
+    secrets:
+      - mysql_password
+    privileged: true
+    networks:
+      - slurmnet
+    ports:
+      - "6819:6819"  # slurmdbd port
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "6819"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - ./shared:/shared
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  controller:
+    build: ./slurm
+    container_name: slurm-controller
+    hostname: controller
+    restart: unless-stopped
+    environment:
+      - ROLE=controller
+      - ROOT_PASSWORD=${ROOT_PASSWORD:-}
+      - WUNMI_PASSWORD=${WUNMI_PASSWORD:-}
+    secrets:
+      - root_password
+      - wunmi_password
+    privileged: true
+    networks:
+      - slurmnet
+    ports:
+      - "2200:22"  # SSH for controller
+      - "6817:6817"  # slurmctld port
+    depends_on:
+      slurmdbd:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "scontrol", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    volumes:
+      - ./shared:/shared
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+  node1:
+    build: ./slurm
+    container_name: slurm-node1
+    hostname: node1
+    restart: unless-stopped
+    environment:
+      - ROLE=worker
+      - ROOT_PASSWORD=${ROOT_PASSWORD:-}
+      - WUNMI_PASSWORD=${WUNMI_PASSWORD:-}
+    secrets:
+      - root_password
+      - wunmi_password
+    privileged: true
+    networks:
+      - slurmnet
+    ports:
+      - "2201:22"  # SSH for node1
+    depends_on:
+      - controller
+    volumes:
+      - ./shared:/shared
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+  node2:
+    build: ./slurm
+    container_name: slurm-node2
+    hostname: node2
+    restart: unless-stopped
+    environment:
+      - ROLE=worker
+      - ROOT_PASSWORD=${ROOT_PASSWORD:-}
+      - WUNMI_PASSWORD=${WUNMI_PASSWORD:-}
+    secrets:
+      - root_password
+      - wunmi_password
+    privileged: true
+    networks:
+      - slurmnet
+    ports:
+      - "2202:22"  # SSH for node2
+    depends_on:
+      - controller
+    volumes:
+      - ./shared:/shared
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+networks:
+  slurmnet:
+    driver: bridge
+
+volumes:
+  mysql_data:
+
+secrets:
+  mysql_root_password:
+    file: ./.secrets/mysql_root_password.txt
+  mysql_password:
+    file: ./.secrets/mysql_password.txt
+  root_password:
+    file: ./.secrets/root_password.txt
+  wunmi_password:
+    file: ./.secrets/wunmi_password.txt
+

@@ -1,0 +1,44 @@
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.env
+!*.env.example
+
+# Docker secrets files
+secrets/
+*.secret
+*.key
+
+# Sensitive configuration files
+**/secrets/
+**/*.secret
+**/*.key
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+

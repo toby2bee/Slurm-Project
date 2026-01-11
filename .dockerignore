@@ -1,0 +1,55 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+!*.env.example
+
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+!README.md
+
+# Docker files
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Secrets and sensitive files
+secrets/
+*.secret
+*.key
+**/secrets/
+**/*.secret
+**/*.key
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
