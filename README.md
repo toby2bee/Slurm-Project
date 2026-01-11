@@ -40,7 +40,7 @@ echo -n "your_password" > secrets/wunmi_password.txt
 chmod 600 secrets/*.txt
 
 # Deploy
-docker-compose up -d
+docker-compose up -d           #goto RUNJOB.md
 ```
 
 ## Prerequisites
